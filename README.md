@@ -10,7 +10,9 @@ roja inspirada en Akira.
 ## Sobre el proyecto
 
 Versión alternativa de mi portafolio de desarrollador. La idea fue llevar
-la atmósfera de Neo Tokyo a la web: [describe 2-3 decisiones de diseño].
+la atmósfera de Neo Tokyo a la web:
+
+Con intensos rojos y caracteres japoneses.
 
 ## Stack
 
