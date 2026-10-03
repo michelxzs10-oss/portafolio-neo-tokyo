@@ -1,35 +1,43 @@
-# Portafolio
+# NEO TOKYO // Portafolio
 
-Portafolio personal con estética Tron, hecho con Astro y Tailwind CSS.
+Portafolio personal de Michel Jaime, desarrollado con Astro y una estética
+roja inspirada en Akira.
 
-## Ejecutar
+🔗 **Demo:** https://portafolio-michel-jaime.vercel.app/
 
-```bash
-npm install
-npm run dev
-```
 
-Abre http://localhost:4321
 
-## Dónde editar
+## Sobre el proyecto
 
-- `src/config.ts`: tu nombre, rol, correo, GitHub y LinkedIn.
-- `src/content/proyectos/`: un archivo `.md` por proyecto.
-- `src/pages/sobre-mi.astro`: tu presentación y herramientas.
-- `src/styles/global.css`: colores y fuentes.
+Versión alternativa de mi portafolio de desarrollador. La idea fue llevar
+la atmósfera de Neo Tokyo a la web: [describe 2-3 decisiones de diseño].
 
-## Agregar un proyecto
+## Stack
 
-1. Copia uno de los archivos de `src/content/proyectos/` y cambia el nombre (el nombre del archivo será la dirección, por ejemplo `mi-robot.md` → `/proyectos/mi-robot/`).
-2. Llena los datos del inicio: título, resumen, fecha, categoría (`web`, `electronica` o `software`) y tecnologías.
-3. `destacado: true` lo muestra en la página de inicio.
-4. `borrador: true` lo oculta hasta que esté listo.
-5. Las imágenes van en `public/proyectos/` y se enlazan como `/proyectos/archivo.png`.
+- Astro
+- [Tailwind CSS / CSS puro]
+- [Otras librerías]
+- Desplegado en [Vercel / Netlify / GitHub Pages]
 
-## Publicar
+## Características
 
-```bash
-npm run build
-```
+- Diseño responsivo
+- [Animación o efecto destacado]
+- [Puntaje de Lighthouse, si es bueno]
 
-Sube la carpeta `dist` a Netlify, Vercel o Cloudflare Pages, o conecta el repositorio de GitHub para que se publique solo con cada cambio. Recuerda actualizar `site` en `astro.config.mjs` con tu dominio.
+
+## Instalación local
+
+    git clone https://github.com/usuario/repo.git
+    cd repo
+    npm install
+    npm run dev
+
+## Contacto
+
+- Correo: michelxzs10@gmail.com
+
+## Créditos
+
+Proyecto de fan inspirado en la estética de Akira. Sin afiliación con los
+titulares de la obra.
