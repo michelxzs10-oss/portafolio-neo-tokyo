@@ -1,0 +1,85 @@
+---
+import { SITIO } from '../config';
+---
+
+<section class="relative isolate overflow-hidden border-b border-cian-tenue/50">
+  <!-- Piso de la Grid en perspectiva -->
+  <div class="piso" aria-hidden="true"></div>
+
+  <!-- Estela de una moto de luz: se dibuja cuando termina el loader -->
+  <svg class="estela-svg" viewBox="0 0 1200 400" preserveAspectRatio="none" aria-hidden="true">
+    <path class="estela" pathLength="1" d="M-20 330 H380 V250 H760 V300 H1220"></path>
+  </svg>
+
+  <div class="relative mx-auto max-w-6xl px-6 pb-40 pt-20 sm:pb-52 sm:pt-28">
+    {
+      SITIO.disponible && (
+        <p class="inline-flex items-center gap-2.5 border border-cian-tenue bg-vacio/70 px-3 py-1.5 text-sm">
+          <span class="punto" aria-hidden="true" />
+          {SITIO.disponibilidad}
+        </p>
+      )
+    }
+    <h1 class="mt-8 max-w-4xl text-5xl font-semibold leading-[1.05] tracking-tight text-blanco sm:text-6xl">
+      {SITIO.nombre}
+    </h1>
+    <p class="mt-6 max-w-2xl text-lg leading-relaxed text-texto/85 sm:text-xl">{SITIO.descripcion}</p>
+    <div class="mt-10 flex flex-wrap gap-3">
+      <a href="/proyectos/" class="bg-cian px-6 py-3 font-medium text-vacio transition-opacity hover:opacity-85">
+        Ver proyectos
+      </a>
+      <a
+        href={SITIO.linkedin || `mailto:${SITIO.email}`}
+        class="border border-cian-tenue px-6 py-3 text-blanco transition-colors hover:border-cian"
+      >
+        {SITIO.linkedin ? 'Ver mi LinkedIn' : 'Escríbeme'}
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .piso {
+    position: absolute;
+    inset: auto -50% 0 -50%;
+    z-index: -1;
+    height: 55%;
+    background-image:
+      linear-gradient(rgb(0 229 255 / 0.22) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(0 229 255 / 0.22) 1px, transparent 1px);
+    background-size: 56px 56px;
+    transform: perspective(420px) rotateX(62deg);
+    transform-origin: bottom;
+    mask-image: linear-gradient(to top, black 30%, transparent);
+  }
+
+  .estela-svg {
+    position: absolute;
+    inset: auto 0 0 0;
+    z-index: -1;
+    width: 100%;
+    height: 55%;
+  }
+
+  .estela {
+    fill: none;
+    stroke: var(--color-naranja);
+    stroke-width: 2.5;
+    vector-effect: non-scaling-stroke;
+    filter: drop-shadow(0 0 6px var(--color-naranja));
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+
+  :global(html.listo) .estela {
+    animation: estela-trazo 2.2s cubic-bezier(0.6, 0, 0.3, 1) 0.15s forwards;
+  }
+
+  @keyframes estela-trazo {
+    to { stroke-dashoffset: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .estela, :global(html.listo) .estela { animation: none; stroke-dashoffset: 0; }
+  }
+</style>

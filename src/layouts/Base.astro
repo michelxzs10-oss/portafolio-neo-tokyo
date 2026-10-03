@@ -1,0 +1,156 @@
+---
+import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
+import { SITIO } from '../config';
+
+interface Props {
+  titulo?: string;
+  descripcion?: string;
+}
+
+const { titulo, descripcion = SITIO.descripcion } = Astro.props;
+const tituloCompleto = titulo ? `${titulo} | ${SITIO.nombre}` : `${SITIO.nombre} | ${SITIO.rol}`;
+const ruta = Astro.url.pathname;
+
+const enlaces = [
+  { href: '/', texto: 'Inicio' },
+  { href: '/proyectos/', texto: 'Proyectos' },
+  { href: '/sobre-mi/', texto: 'Sobre mí' },
+];
+const esActivo = (href: string) => (href === '/' ? ruta === '/' : ruta.startsWith(href));
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{tituloCompleto}</title>
+    <meta name="description" content={descripcion} />
+    <meta name="theme-color" content="#c8141c" />
+    <meta property="og:title" content={tituloCompleto} />
+    <meta property="og:description" content={descripcion} />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Decide antes de pintar la página si se muestra el loader de arranque -->
+    <script is:inline data-astro-rerun>
+      (function () {
+        var d = document.documentElement;
+        d.classList.add('js');
+        var mostrar = false;
+        try {
+          mostrar = !sessionStorage.getItem('grid-arranque') &&
+            !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          sessionStorage.setItem('grid-arranque', '1');
+        } catch (e) {}
+        if (!mostrar) { d.classList.add('listo'); return; }
+        d.classList.add('con-arranque');
+        setTimeout(function () { d.classList.add('arranque-fin'); }, 1200);
+        setTimeout(function () {
+          d.classList.remove('con-arranque', 'arranque-fin');
+          d.classList.add('listo');
+        }, 1700);
+      })();
+    </script>
+
+    <ClientRouter />
+  </head>
+  <body class="flex min-h-screen flex-col">
+    <div id="arranque" aria-hidden="true">
+      <div class="arranque-logo">
+        <svg viewBox="0 0 100 100"><rect x="2" y="2" width="96" height="96" pathLength="1"></rect></svg>
+        <span>{SITIO.iniciales}</span>
+      </div>
+      <div class="arranque-barra"><span></span></div>
+      <div class="arranque-linea"></div>
+    </div>
+
+    <div id="barra-nav" aria-hidden="true" transition:persist></div>
+
+    <a
+      href="#contenido"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:bg-vacio focus:px-3 focus:py-2"
+    >
+      Saltar al contenido
+    </a>
+
+    <header class="sticky top-0 z-20 border-b-[3px] border-vacio bg-rojo">
+      <nav class="mx-auto flex max-w-6xl items-center justify-between gap-6 px-6 py-3" aria-label="Principal">
+        <a href="/" class="flex items-baseline gap-3 text-vacio" aria-label={`${SITIO.nombre}, inicio`}>
+          <span class="font-display text-2xl tracking-wide">{SITIO.iniciales}</span>
+          <span class="kana hidden text-sm text-vacio sm:inline" lang="ja" aria-hidden="true">ポートフォリオ</span>
+        </a>
+        <div class="flex items-center gap-7">
+          <ul class="flex gap-6 text-sm font-bold uppercase tracking-[0.14em] text-blanco">
+            {
+              enlaces.map((e) => (
+                <li>
+                  <a
+                    href={e.href}
+                    class:list={[
+                      'underline-offset-8 decoration-2 decoration-vacio hover:underline',
+                      esActivo(e.href) && 'underline',
+                    ]}
+                    aria-current={esActivo(e.href) ? 'page' : undefined}
+                  >
+                    {e.texto}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+          <a
+            href={`mailto:${SITIO.email}`}
+            class="hidden bg-vacio px-4 py-2 text-sm font-bold uppercase tracking-[0.14em] text-blanco transition-opacity hover:opacity-85 sm:inline-block"
+          >
+            Contacto
+          </a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="contenido" class="flex-1" transition:animate="fade">
+      <slot />
+    </main>
+
+    <div class="franja" aria-hidden="true"></div>
+    <footer class="bg-rojo text-blanco">
+      <div class="mx-auto grid max-w-6xl gap-8 px-6 py-12 sm:grid-cols-2 sm:items-end">
+        <div>
+          <p class="kana text-6xl leading-none text-vacio sm:text-8xl" lang="ja" aria-hidden="true">連絡</p>
+          <p class="mt-4 font-display text-3xl uppercase">{SITIO.nombre}</p>
+          <p class="mt-1 text-sm">{SITIO.rol}</p>
+        </div>
+        <ul class="flex flex-wrap gap-x-8 gap-y-2 text-sm font-bold uppercase tracking-[0.14em] sm:justify-end">
+          <li><a class="underline-offset-8 decoration-2 decoration-vacio hover:underline" href={`mailto:${SITIO.email}`}>Correo</a></li>
+          <li><a class="underline-offset-8 decoration-2 decoration-vacio hover:underline" href={SITIO.github}>GitHub</a></li>
+          {SITIO.linkedin && <li><a class="underline-offset-8 decoration-2 decoration-vacio hover:underline" href={SITIO.linkedin}>LinkedIn</a></li>}
+        </ul>
+      </div>
+    </footer>
+
+    <script>
+      // Barra de luz en la parte superior mientras carga la siguiente página
+      const barra = () => document.getElementById('barra-nav');
+      document.addEventListener('astro:before-preparation', () => {
+        const b = barra();
+        if (!b) return;
+        b.classList.remove('fin');
+        b.classList.add('activa');
+      });
+      document.addEventListener('astro:after-swap', () => {
+        const b = barra();
+        if (!b) return;
+        b.classList.add('fin');
+        setTimeout(() => b.classList.remove('activa', 'fin'), 600);
+      });
+    </script>
+  </body>
+</html>

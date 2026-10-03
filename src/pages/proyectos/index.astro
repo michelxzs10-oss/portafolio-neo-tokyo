@@ -1,0 +1,63 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import TarjetaProyecto from '../../components/TarjetaProyecto.astro';
+import { CATEGORIAS } from '../../config';
+
+const proyectos = (await getCollection('proyectos', ({ data }) => !data.borrador))
+  .sort((a, b) => b.data.fecha.getTime() - a.data.fecha.getTime());
+
+const filtros = [
+  { id: 'todos', texto: 'Todos', cantidad: proyectos.length },
+  ...Object.entries(CATEGORIAS).map(([id, texto]) => ({
+    id,
+    texto,
+    cantidad: proyectos.filter((p) => p.data.categoria === id).length,
+  })),
+].filter((f) => f.cantidad > 0);
+---
+
+<Base titulo="Proyectos" descripcion="Sitios web, visualizaciones, electrónica y software.">
+  <div class="mx-auto max-w-6xl px-6 py-20">
+    <p class="kana text-2xl" lang="ja" aria-hidden="true">プロジェクト</p>
+    <h1 class="titular text-6xl sm:text-8xl mt-2">Proyectos</h1>
+    <p class="mt-5 max-w-xl text-lg leading-relaxed text-texto/85">
+      Lo que he construido, desde sitios web hasta cosas que se encienden.
+    </p>
+
+    <div class="mt-12 flex flex-wrap gap-2" role="group" aria-label="Filtrar por tipo">
+      {
+        filtros.map((f) => (
+          <button
+            type="button"
+            data-filtro={f.id}
+            aria-pressed={f.id === 'todos' ? 'true' : 'false'}
+            class="border-2 border-cian-tenue px-4 py-1.5 text-sm font-bold uppercase tracking-[0.1em] text-tenue transition-colors hover:text-blanco aria-pressed:border-cian aria-pressed:bg-cian aria-pressed:text-vacio"
+          >
+            {f.texto} <span class="ml-1 tabular-nums opacity-70">{f.cantidad}</span>
+          </button>
+        ))
+      }
+    </div>
+
+    <div id="rejilla" class="mt-12 grid gap-x-8 gap-y-16 sm:grid-cols-2">
+      {proyectos.map((p, i) => <TarjetaProyecto proyecto={p} carga={i < 2 ? 'eager' : 'lazy'} />)}
+    </div>
+  </div>
+</Base>
+
+<script>
+  function iniciarFiltros() {
+    const botones = document.querySelectorAll<HTMLButtonElement>('[data-filtro]');
+    botones.forEach((boton) => {
+      boton.addEventListener('click', () => {
+        const filtro = boton.dataset.filtro;
+        botones.forEach((b) => b.setAttribute('aria-pressed', String(b === boton)));
+        document.querySelectorAll<HTMLElement>('#rejilla [data-categoria]').forEach((t) => {
+          t.hidden = filtro !== 'todos' && t.dataset.categoria !== filtro;
+        });
+      });
+    });
+  }
+  document.addEventListener('astro:page-load', iniciarFiltros);
+</script>

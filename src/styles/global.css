@@ -1,0 +1,306 @@
+@import "tailwindcss";
+
+/* TEMA NEO TOKYO
+   Los nombres de las variables son los del tema Tron para que las clases
+   que ya usas (text-cian, border-cian-tenue, bg-vacio...) sigan funcionando
+   sin tocar los componentes. Solo cambian los valores:
+   cian = rojo señal, naranja = ámbar, blanco = hueso. */
+@theme {
+  --color-vacio: #0c0b0b;       /* negro tinta */
+  --color-panel: #171413;
+  --color-cian: #f03a2e;        /* rojo señal: texto, bordes activos, botones */
+  --color-cian-tenue: #5c2320;  /* bordes apagados */
+  --color-naranja: #ffb020;     /* ámbar: foco y franjas de precaución */
+  --color-texto: #e9dfcc;
+  --color-tenue: #a3978a;
+  --color-blanco: #f4ead8;      /* hueso */
+  --color-rojo: #c8141c;        /* rojo cartel: bloques grandes (cabecera, pie) */
+
+  --font-display: "Anton", "Dela Gothic One", sans-serif;
+  --font-sans: "Zen Kaku Gothic New", "Hiragino Sans", system-ui, sans-serif;
+}
+
+html {
+  background: var(--color-vacio);
+  color: var(--color-texto);
+  font-family: var(--font-sans);
+  color-scheme: dark;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: var(--color-cian); color: var(--color-vacio); }
+
+:focus-visible {
+  outline: 2px solid var(--color-naranja);
+  outline-offset: 3px;
+}
+
+/* ==========================================================
+   LOADER DE ARRANQUE (solo la primera visita de la sesión)
+   ========================================================== */
+#arranque { display: none; }
+
+.con-arranque body { overflow: hidden; }
+
+.con-arranque #arranque {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 28px;
+  background: var(--color-vacio);
+}
+
+.arranque-logo {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+}
+.arranque-logo svg { position: absolute; inset: 0; overflow: visible; }
+.arranque-logo rect {
+  fill: none;
+  stroke: var(--color-naranja);
+  stroke-width: 3;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  filter: drop-shadow(0 0 5px var(--color-naranja));
+  animation: arranque-trazo 0.9s cubic-bezier(0.6, 0, 0.3, 1) forwards;
+}
+.arranque-logo span {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--color-cian);
+  opacity: 0;
+  animation: arranque-aparecer 0.4s 0.55s forwards;
+}
+
+.arranque-barra {
+  width: 160px;
+  height: 3px;
+  overflow: hidden;
+  background: var(--color-cian-tenue);
+}
+.arranque-barra span {
+  display: block;
+  height: 100%;
+  background: var(--color-cian);
+  box-shadow: 0 0 8px var(--color-cian);
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: arranque-llenar 1.05s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.arranque-linea {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--color-cian);
+  box-shadow: 0 0 12px var(--color-cian);
+  transform: scaleX(0);
+}
+
+/* Al terminar, la pantalla se colapsa en una línea de luz y desaparece */
+.arranque-fin #arranque { animation: arranque-colapsar 0.5s cubic-bezier(0.7, 0, 0.3, 1) forwards; }
+.arranque-fin .arranque-linea { animation: arranque-linea 0.5s ease-out forwards; }
+.arranque-fin .arranque-logo,
+.arranque-fin .arranque-barra { opacity: 0; transition: opacity 0.15s; }
+
+@keyframes arranque-trazo { to { stroke-dashoffset: 0; } }
+@keyframes arranque-aparecer { to { opacity: 1; } }
+@keyframes arranque-llenar { to { transform: scaleX(1); } }
+@keyframes arranque-colapsar {
+  0% { clip-path: inset(0 0 0 0); }
+  55% { clip-path: inset(calc(50% - 1px) 0 calc(50% - 1px) 0); opacity: 1; }
+  100% { clip-path: inset(calc(50% - 1px) 0 calc(50% - 1px) 0); opacity: 0; }
+}
+@keyframes arranque-linea {
+  0% { transform: scaleX(0.15); }
+  55%, 100% { transform: scaleX(1); }
+}
+
+/* ==========================================================
+   BARRA DE CARGA ENTRE PÁGINAS
+   ========================================================== */
+#barra-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 60;
+  width: 100%;
+  height: 3px;
+  background: var(--color-naranja);
+  box-shadow: 0 0 10px var(--color-naranja);
+  transform: scaleX(0);
+  transform-origin: left;
+  opacity: 0;
+  pointer-events: none;
+}
+#barra-nav.activa {
+  opacity: 1;
+  transform: scaleX(0.7);
+  transition: transform 1.5s cubic-bezier(0.1, 0.6, 0.2, 1);
+}
+#barra-nav.fin {
+  opacity: 0;
+  transform: scaleX(1);
+  transition: transform 0.2s ease-out, opacity 0.35s 0.2s;
+}
+
+/* ==========================================================
+   MINIATURAS CON BARRIDO MIENTRAS CARGAN
+   ========================================================== */
+.miniatura {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  background: var(--color-panel);
+  border: 2px solid var(--color-blanco);
+  transition: border-color 0.3s, box-shadow 0.25s, transform 0.25s;
+}
+.miniatura::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent 40%, color-mix(in srgb, var(--color-cian) 16%, transparent) 50%, transparent 60%);
+  background-size: 250% 100%;
+  animation: barrido 1.6s linear infinite;
+}
+.miniatura.sin-imagen::after,
+.miniatura:has(img[data-listo])::after { display: none; }
+.miniatura img,
+.miniatura svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.5s, transform 0.6s cubic-bezier(0.2, 0, 0, 1);
+}
+.js .miniatura img:not([data-listo]) { opacity: 0; }
+
+.tarjeta:hover .miniatura,
+.tarjeta:focus-within .miniatura {
+  border-color: var(--color-blanco);
+  box-shadow: 8px 8px 0 var(--color-rojo);
+  transform: translate(-3px, -3px);
+}
+.tarjeta:hover .miniatura img,
+.tarjeta:hover .miniatura svg { transform: scale(1.02); }
+.tarjeta.grande .miniatura { aspect-ratio: 16 / 10; }
+@media (min-width: 640px) {
+  .tarjeta.grande .miniatura { aspect-ratio: 21 / 9; }
+}
+
+@keyframes barrido {
+  from { background-position: 150% 0; }
+  to { background-position: -100% 0; }
+}
+
+/* Punto de disponibilidad */
+.punto {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-cian);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-cian) 60%, transparent);
+  animation: latido 2.4s ease-out infinite;
+}
+@keyframes latido {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-cian) 55%, transparent); }
+  70%, 100% { box-shadow: 0 0 0 8px transparent; }
+}
+
+/* Paneles de borde grueso con sombra dura (antes: esquinas de luz) */
+.panel-esquinas {
+  border: 2px solid var(--color-blanco);
+  background: var(--color-panel);
+  box-shadow: 8px 8px 0 var(--color-rojo);
+}
+
+/* ==========================================================
+   PIEZAS DEL TEMA NEO TOKYO
+   ========================================================== */
+/* Título de cartel: <h1 class="titular"> */
+.titular {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 0.92;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  color: var(--color-blanco);
+}
+
+/* Etiqueta en japonés junto a un título */
+.kana {
+  font-family: "Dela Gothic One", var(--font-display);
+  font-weight: 400;
+  color: var(--color-cian);
+}
+
+/* Franja de precaución ámbar y negra: <div class="franja" aria-hidden="true"> */
+.franja {
+  height: 16px;
+  background: repeating-linear-gradient(
+    135deg,
+    var(--color-naranja) 0 16px,
+    var(--color-vacio) 16px 32px
+  );
+}
+
+/* Trama de puntos de manga, para fondos de bloques claros */
+.trama {
+  background-color: var(--color-blanco);
+  background-image: radial-gradient(var(--color-vacio) 1.6px, transparent 1.8px);
+  background-size: 9px 9px;
+}
+
+/* Sombra dura para botones y cajas: <a class="sombra-dura"> */
+.sombra-dura { box-shadow: 6px 6px 0 var(--color-rojo); }
+
+/* ==========================================================
+   TEXTO DE LOS PROYECTOS (Markdown)
+   ========================================================== */
+.prosa { font-size: 1.0625rem; line-height: 1.75; }
+.prosa > * + * { margin-top: 1rem; }
+.prosa h2 {
+  margin-top: 2.75rem;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 400;
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: var(--color-blanco);
+}
+.prosa h3 { margin-top: 2rem; font-weight: 700; color: var(--color-blanco); }
+.prosa ul { list-style: disc; padding-left: 1.25rem; }
+.prosa ol { list-style: decimal; padding-left: 1.25rem; }
+.prosa li + li { margin-top: 0.35rem; }
+.prosa li::marker { color: var(--color-cian); }
+.prosa a { color: var(--color-cian); text-decoration: underline; text-underline-offset: 3px; }
+.prosa strong { font-weight: 700; color: var(--color-blanco); }
+.prosa code {
+  padding: 0.1rem 0.35rem;
+  font-size: 0.9em;
+  background: var(--color-panel);
+  border: 1px solid var(--color-cian-tenue);
+}
+.prosa pre { overflow-x: auto; padding: 1rem; background: var(--color-panel); border: 1px solid var(--color-cian-tenue); }
+.prosa pre code { padding: 0; border: 0; background: none; }
+.prosa img { max-width: 100%; border: 2px solid var(--color-blanco); }
+
+/* ==========================================================
+   MOVIMIENTO REDUCIDO
+   ========================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .miniatura::after, .punto { animation: none; }
+  #barra-nav.activa, #barra-nav.fin { transition: none; }
+  .miniatura img, .miniatura svg { transition: none; }
+}

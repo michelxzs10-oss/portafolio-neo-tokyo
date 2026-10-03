@@ -1,0 +1,103 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITIO } from '../config';
+
+const formacion = [
+  { titulo: 'Ingeniería en Comunicaciones y Electrónica', lugar: 'ESIME Zacatenco, IPN', fecha: '2024 – 2028' },
+  { titulo: 'Técnico en Programación', lugar: 'CECyTEM, Plantel Tultitlán', fecha: '2020 – 2023' },
+];
+
+const cursos = [
+  { titulo: 'Fundamentos de Seguridad de Redes', lugar: 'CIC-IPN', fecha: 'Concluido en marzo de 2026' },
+  { titulo: 'Getting Started in Cybersecurity', lugar: 'Fortinet', fecha: '2025 – enero de 2026' },
+  { titulo: 'Introduction to Cyber Security', lugar: 'TryHackMe', fecha: '2025 – actualidad' },
+];
+
+const herramientas = [
+  { area: 'Seguridad', lista: 'Fundamentos de redes, firewalls y defensa perimetral' },
+  { area: 'Programación', lista: 'Python, Java, PHP, JavaScript, HTML y CSS' },
+  { area: 'Sistemas', lista: 'Windows, Linux (Ubuntu y Linux Mint), Git, Raspberry Pi' },
+  { area: 'Idiomas', lista: 'Español nativo, inglés B1' },
+];
+---
+
+<Base titulo="Sobre mí">
+  <div class="mx-auto max-w-6xl px-6 py-20">
+    <div class="grid gap-14 lg:grid-cols-[1fr_20rem]">
+      <div class="max-w-3xl">
+        <p class="kana text-2xl" lang="ja" aria-hidden="true">私について</p>
+        <h1 class="titular text-6xl sm:text-8xl mt-2">Sobre mí</h1>
+
+        <div class="prosa mt-10">
+          <p>
+            Soy {SITIO.nombre}, estudiante de Ingeniería en Comunicaciones y Electrónica en la ESIME Zacatenco del IPN
+            y Técnico en Programación por el CECyTEM.
+          </p>
+          <p>
+            Me interesa la ciberseguridad, en especial el monitoreo de eventos y la respuesta a incidentes. He tomado
+            cursos de seguridad de redes en el CIC-IPN y con Fortinet, y practico en laboratorios de TryHackMe. Busco mi
+            primera oportunidad como becario o trainee en un equipo de seguridad o SOC.
+          </p>
+          <p>
+            Desde 2024 doy soporte técnico independiente: diagnóstico y reparación de equipos, instalación de sistemas
+            operativos y asesoría a usuarios en protección de datos. En paralelo programo proyectos propios, desde
+            sitios web hasta visualizaciones con datos en tiempo real.
+          </p>
+        </div>
+
+        <h2 class="titular mt-16 text-4xl">Formación</h2>
+        <ul class="mt-6 grid gap-5">
+          {
+            formacion.map((f) => (
+              <li class="border-l-[3px] border-cian pl-4">
+                <p class="font-medium text-blanco">{f.titulo}</p>
+                <p class="mt-0.5 text-sm text-tenue">{f.lugar}, {f.fecha}</p>
+              </li>
+            ))
+          }
+        </ul>
+
+        <h2 class="titular mt-14 text-4xl">Cursos</h2>
+        <ul class="mt-6 grid gap-5">
+          {
+            cursos.map((c) => (
+              <li class="border-l-[3px] border-cian-tenue pl-4">
+                <p class="font-medium text-blanco">{c.titulo}</p>
+                <p class="mt-0.5 text-sm text-tenue">{c.lugar}, {c.fecha}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <aside class="lg:pt-32">
+        <h2 class="titular text-2xl">Habilidades</h2>
+        <dl class="mt-6 grid gap-5">
+          {
+            herramientas.map((h) => (
+              <div class="border-l-[3px] border-cian pl-4">
+                <dt class="text-sm text-tenue">{h.area}</dt>
+                <dd class="mt-1 text-blanco">{h.lista}</dd>
+              </div>
+            ))
+          }
+        </dl>
+
+        <h2 class="titular mt-12 text-2xl">Contacto</h2>
+        <div class="mt-5 grid gap-2">
+          <a href={`mailto:${SITIO.email}`} class="bg-cian px-5 py-2.5 text-center font-bold uppercase tracking-[0.1em] text-vacio transition-opacity hover:opacity-85 sombra-dura mb-2">
+            Escribirme
+          </a>
+          {SITIO.linkedin && (
+            <a href={SITIO.linkedin} class="border border-cian-tenue px-5 py-2.5 text-center text-blanco transition-colors hover:border-cian">
+              LinkedIn
+            </a>
+          )}
+          <a href={SITIO.github} class="border border-cian-tenue px-5 py-2.5 text-center text-blanco transition-colors hover:border-cian">
+            GitHub
+          </a>
+        </div>
+      </aside>
+    </div>
+  </div>
+</Base>

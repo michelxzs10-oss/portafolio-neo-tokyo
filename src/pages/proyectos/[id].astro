@@ -1,0 +1,95 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Miniatura from '../../components/Miniatura.astro';
+import { CATEGORIAS } from '../../config';
+
+export async function getStaticPaths() {
+  const proyectos = (await getCollection('proyectos', ({ data }) => !data.borrador))
+    .sort((a, b) => b.data.fecha.getTime() - a.data.fecha.getTime());
+  return proyectos.map((p, i) => ({
+    params: { id: p.id },
+    props: {
+      proyecto: p,
+      anterior: proyectos[i + 1] ?? null,
+      siguiente: proyectos[i - 1] ?? null,
+    },
+  }));
+}
+
+const { proyecto, anterior, siguiente } = Astro.props;
+const { Content } = await render(proyecto);
+const d = proyecto.data;
+---
+
+<Base titulo={d.titulo} descripcion={d.resumen}>
+  <article class="mx-auto max-w-6xl px-6 py-16">
+    <a href="/proyectos/" class="text-sm text-tenue transition-colors hover:text-cian">Todos los proyectos</a>
+
+    <header class="mt-8 max-w-3xl">
+      <h1 class="titular text-5xl sm:text-7xl">{d.titulo}</h1>
+      <p class="mt-5 text-lg leading-relaxed text-texto/85 sm:text-xl">{d.resumen}</p>
+    </header>
+
+    <div class="mt-12">
+      <Miniatura imagen={d.imagen} alt={d.imagenAlt} semilla={proyecto.id} etiqueta={CATEGORIAS[d.categoria]} carga="eager" />
+    </div>
+
+    <div class="mt-14 grid gap-12 lg:grid-cols-[1fr_17rem]">
+      <div class="prosa max-w-3xl">
+        <Content />
+      </div>
+
+      <aside class="lg:sticky lg:top-24 lg:self-start">
+        <dl class="grid gap-5 border-t-[3px] border-cian pt-5 text-sm">
+          <div><dt class="text-tenue">Tipo</dt><dd class="mt-1 text-blanco">{CATEGORIAS[d.categoria]}</dd></div>
+          <div><dt class="text-tenue">Año</dt><dd class="mt-1 text-blanco">{d.fecha.getFullYear()}</dd></div>
+          {d.cliente && <div><dt class="text-tenue">Cliente</dt><dd class="mt-1 text-blanco">{d.cliente}</dd></div>}
+          {
+            d.tecnologias.length > 0 && (
+              <div>
+                <dt class="text-tenue">Tecnologías</dt>
+                <dd class="mt-1 leading-relaxed text-blanco">{d.tecnologias.join(', ')}</dd>
+              </div>
+            )
+          }
+        </dl>
+        {
+          (d.demo || d.codigo) && (
+            <div class="mt-8 grid gap-2">
+              {d.demo && (
+                <a href={d.demo} class="bg-cian px-5 py-2.5 text-center font-bold uppercase tracking-[0.1em] text-vacio transition-opacity hover:opacity-85">
+                  Ver en vivo
+                </a>
+              )}
+              {d.codigo && (
+                <a href={d.codigo} class="border border-cian-tenue px-5 py-2.5 text-center text-blanco transition-colors hover:border-cian">
+                  Ver el código
+                </a>
+              )}
+            </div>
+          )
+        }
+      </aside>
+    </div>
+
+    {
+      (anterior || siguiente) && (
+        <nav class="mt-20 grid gap-4 border-t border-cian-tenue/50 pt-8 sm:grid-cols-2" aria-label="Otros proyectos">
+          {anterior ? (
+            <a href={`/proyectos/${anterior.id}/`} class="group">
+              <span class="text-sm text-tenue">Proyecto anterior</span>
+              <span class="mt-1 block text-lg text-blanco transition-colors group-hover:text-cian">{anterior.data.titulo}</span>
+            </a>
+          ) : <span />}
+          {siguiente && (
+            <a href={`/proyectos/${siguiente.id}/`} class="group sm:text-right">
+              <span class="text-sm text-tenue">Siguiente proyecto</span>
+              <span class="mt-1 block text-lg text-blanco transition-colors group-hover:text-cian">{siguiente.data.titulo}</span>
+            </a>
+          )}
+        </nav>
+      )
+    }
+  </article>
+</Base>
